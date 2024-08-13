@@ -4,6 +4,7 @@ import { Spin, Empty, message } from 'antd';
 import axios from 'axios';
 import { preset as remoteLoaderPreset } from '@kne/remote-loader';
 import omit from 'lodash/omit';
+import { getApis } from '@components/Apis';
 
 window.PUBLIC_URL = window.runtimePublicUrl || process.env.PUBLIC_URL;
 
@@ -107,6 +108,9 @@ export const globalInit = async () => {
 
   return {
     ajax,
+    apis: {
+      cms: getApis()
+    },
     themeToken: {
       colorPrimary: '#4F185A',
       colorPrimaryHover: '#702280'

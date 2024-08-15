@@ -91,6 +91,11 @@ export const globalInit = async () => {
         remote: 'components-iconfont',
         defaultVersion: '0.1.8'
       },
+      'components-view': {
+        ...registry,
+        remote: 'components-view',
+        defaultVersion: '0.1.19'
+      },
       'components-cms':
         process.env.NODE_ENV === 'development'
           ? {

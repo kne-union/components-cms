@@ -1,25 +1,8 @@
-
-# Group
-
-
-### 概述
-
-对象集合
-
-
-### 示例
-
-#### 示例代码
-
-- 这里填写示例标题
-- 这里填写示例说明
-- _Group(@components/Group),lodash(lodash),_Apis(@components/Apis),remoteLoader(@kne/remote-loader)
-
-```jsx
-const { default: Group } = _Group;
+const { default: Cms } = _Cms;
 const { createWithRemoteLoader } = remoteLoader;
 const { getApis } = _Apis;
 const { merge } = lodash;
+const { Routes, Route, Navigate } = reactRouter;
 
 const BaseExample = createWithRemoteLoader({
   modules: ['Global@PureGlobal', 'Global@usePreset', 'Layout']
@@ -35,19 +18,13 @@ const BaseExample = createWithRemoteLoader({
       })}
     >
       <Layout navigation={{ isFixed: false }}>
-        <Group />
+        <Routes>
+          <Route path="/Cms/*" element={<Cms baseUrl="/Cms" />} />
+          <Route path="*" element={<Navigate to="/Cms" />} />
+        </Routes>
       </Layout>
     </PureGlobal>
   );
 });
 
 render(<BaseExample />);
-
-```
-
-
-### API
-
-|属性名|说明|类型|默认值|
-|  ---  | ---  | --- | --- |
-

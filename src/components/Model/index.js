@@ -1,44 +1,66 @@
+import style from './style.module.scss';
 import { useRef } from 'react';
+import { useSearchParams, Navigate, useNavigate } from 'react-router-dom';
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import getColumns from './getColumns';
 import { Space, Button, App } from 'antd';
+import Fetch from '@kne/react-fetch';
 import FormInner from './FormInner';
-import { useNavigate } from 'react-router-dom';
 
-const Group = createWithRemoteLoader({
+const Model = createWithRemoteLoader({
   modules: ['components-core:Layout@TablePage', 'components-core:Global@usePreset', 'components-core:FormInfo@useFormModal']
 })(({ remoteModules, baseUrl = '' }) => {
   const [TablePage, usePreset, useFormModal] = remoteModules;
-  const ref = useRef(null);
   const { ajax, apis } = usePreset();
+  const [searchParams] = useSearchParams();
+  const objectGroupCode = searchParams.get('group');
+  const ref = useRef(null);
   const formModal = useFormModal();
   const navigate = useNavigate();
   const { message } = App.useApp();
+  if (!objectGroupCode) {
+    return <Navigate to="/404" />;
+  }
   return (
     <TablePage
-      {...Object.assign({}, apis.cms.group.getList)}
+      {...Object.assign({}, apis.cms.model.getList, {
+        params: { objectGroupCode }
+      })}
+      ref={ref}
       page={{
+        backUrl: baseUrl,
+        title: (
+          <Fetch
+            {...Object.assign({}, apis.cms.group.getDetailByCode, { params: { code: objectGroupCode } })}
+            render={({ data }) => {
+              return data.name;
+            }}
+          />
+        ),
         titleExtra: (
           <Space>
             <Button
               type="primary"
               onClick={() => {
                 const formModalApi = formModal({
-                  title: '添加对象集合',
+                  title: '添加对象',
                   size: 'small',
                   formProps: {
                     onSubmit: async data => {
                       const { data: resData } = await ajax(
-                        Object.assign({}, apis.cms.group.add, {
-                          data
+                        Object.assign({}, apis.cms.model.add, {
+                          data: Object.assign({}, data, {
+                            objectGroupCode
+                          })
                         })
                       );
+
                       if (resData.code !== 0) {
                         return;
                       }
-                      message.success('添加对象集合成功');
-                      formModalApi.close();
+                      message.success('添加对象成功');
                       ref.current.reload();
+                      formModalApi.close();
                     }
                   },
                   children: <FormInner />
@@ -50,15 +72,15 @@ const Group = createWithRemoteLoader({
           </Space>
         )
       }}
-      ref={ref}
       columns={[
         ...getColumns({
           navigateTo: item => {
-            navigate(`${baseUrl}/models?group=${item.code}`);
+            navigate(`${baseUrl}/model-detail?model=${item.code}`);
           }
         }),
         {
           name: 'options',
+          title: '操作',
           type: 'options',
           fixed: 'right',
           valueOf: item => {
@@ -67,20 +89,21 @@ const Group = createWithRemoteLoader({
                 children: '编辑',
                 onClick: () => {
                   const formModalApi = formModal({
-                    title: '修改对象集合',
+                    title: '编辑对象',
                     size: 'small',
                     formProps: {
                       data: Object.assign({}, item),
                       onSubmit: async data => {
                         const { data: resData } = await ajax(
-                          Object.assign({}, apis.cms.group.save, {
+                          Object.assign({}, apis.cms.model.save, {
                             data: Object.assign({}, data, { id: item.id })
                           })
                         );
+
                         if (resData.code !== 0) {
                           return;
                         }
-                        message.success('修改对象集合成功');
+                        message.success('对象修改成功');
                         formModalApi.close();
                         ref.current.reload();
                       }
@@ -89,52 +112,15 @@ const Group = createWithRemoteLoader({
                   });
                 }
               },
-              item.status === 0
-                ? {
-                    children: '关闭',
-                    message: '确定要关闭该对象集合，该操作会导致当前对象集合不再可用',
-                    isDelete: false,
-                    onClick: async () => {
-                      const { data: resData } = await ajax(
-                        Object.assign({}, apis.cms.group.close, {
-                          data: { id: item.id }
-                        })
-                      );
-                      if (resData.code !== 0) {
-                        return;
-                      }
-                      message.success('关闭对象集合成功');
-                      ref.current.reload();
-                    }
-                  }
-                : {
-                    children: '开启',
-                    onClick: async () => {
-                      const { data: resData } = await ajax(
-                        Object.assign({}, apis.cms.group.open, {
-                          data: { id: item.id }
-                        })
-                      );
-                      if (resData.code !== 0) {
-                        return;
-                      }
-                      message.success('开启对象集合成功');
-                      ref.current.reload();
-                    }
-                  },
               {
                 children: '删除',
-                message: '确定要删除该对象集合吗？注意包含对象的集合不允许被删除请使用关闭操作',
+                message: '确定要删除该对象吗？请勿删除已经使用的对象',
                 onClick: async () => {
-                  const { data: resData } = await ajax(
-                    Object.assign({}, apis.cms.group.remove, {
-                      data: { id: item.id }
-                    })
-                  );
+                  const { data: resData } = await ajax(Object.assign({}, apis.cms.model.remove, { data: { id: item.id } }));
                   if (resData.code !== 0) {
                     return;
                   }
-                  message.success('删除对象集合成功');
+                  message.success('删除对象成功');
                   ref.current.reload();
                 }
               }
@@ -142,10 +128,13 @@ const Group = createWithRemoteLoader({
           }
         }
       ]}
-      name="cms-group"
-      pagination={{ paramsType: 'params' }}
+      dataFormat={data => {
+        return { list: data };
+      }}
+      name="cms-model"
+      pagination={{ open: false }}
     />
   );
 });
 
-export default Group;
+export default Model;

@@ -11,6 +11,10 @@ const getApis = options => {
         url: `${prefix}/group/getList`,
         method: 'GET'
       },
+      getDetailByCode: {
+        url: `${prefix}/group/getDetailByCode`,
+        method: 'GET'
+      },
       save: {
         url: `${prefix}/group/save`,
         method: 'POST'
@@ -25,6 +29,28 @@ const getApis = options => {
       },
       remove: {
         url: `${prefix}/group/remove`,
+        method: 'POST'
+      }
+    },
+    model: {
+      add: {
+        url: `${prefix}/model/add`,
+        method: 'POST'
+      },
+      getList: {
+        url: `${prefix}/model/getList`,
+        method: 'GET'
+      },
+      getDetailByCode: {
+        url: `${prefix}/model/getDetailByCode`,
+        method: 'GET'
+      },
+      save: {
+        url: `${prefix}/model/save`,
+        method: 'POST'
+      },
+      remove: {
+        url: `${prefix}/model/remove`,
         method: 'POST'
       }
     }

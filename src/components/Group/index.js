@@ -54,7 +54,7 @@ const Group = createWithRemoteLoader({
       columns={[
         ...getColumns({
           navigateTo: item => {
-            navigate(`${baseUrl}/models?group=${item.code}`);
+            navigate(`${baseUrl}/object?group=${item.code}`);
           }
         }),
         {

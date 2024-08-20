@@ -32,25 +32,89 @@ const getApis = options => {
         method: 'POST'
       }
     },
-    model: {
+    object: {
       add: {
-        url: `${prefix}/model/add`,
+        url: `${prefix}/object/add`,
         method: 'POST'
       },
       getList: {
-        url: `${prefix}/model/getList`,
+        url: `${prefix}/object/getList`,
         method: 'GET'
       },
       getDetailByCode: {
-        url: `${prefix}/model/getDetailByCode`,
+        url: `${prefix}/object/getDetailByCode`,
+        method: 'GET'
+      },
+      getMetaInfo: {
+        url: `${prefix}/object/getMetaInfo`,
         method: 'GET'
       },
       save: {
-        url: `${prefix}/model/save`,
+        url: `${prefix}/object/save`,
         method: 'POST'
       },
       remove: {
-        url: `${prefix}/model/remove`,
+        url: `${prefix}/object/remove`,
+        method: 'POST'
+      },
+      close: {
+        url: `${prefix}/object/close`,
+        method: 'POST'
+      },
+      open: {
+        url: `${prefix}/object/open`,
+        method: 'POST'
+      }
+    },
+    field: {
+      getList: {
+        url: `${prefix}/field/getList`,
+        method: 'GET'
+      },
+      add: {
+        url: `${prefix}/field/add`,
+        method: 'POST'
+      },
+      save: {
+        url: `${prefix}/field/save`,
+        method: 'POST'
+      },
+      close: {
+        url: `${prefix}/field/close`,
+        method: 'POST'
+      },
+      open: {
+        url: `${prefix}/field/open`,
+        method: 'POST'
+      },
+      remove: {
+        url: `${prefix}/field/remove`,
+        method: 'POST'
+      },
+      moveUp: {
+        url: `${prefix}/field/moveUp`,
+        method: 'POST'
+      },
+      moveDown: {
+        url: `${prefix}/field/moveDown`,
+        method: 'POST'
+      }
+    },
+    content: {
+      getList: {
+        url: `${prefix}/content/getList`,
+        method: 'GET'
+      },
+      add: {
+        url: `${prefix}/content/add`,
+        method: 'POST'
+      },
+      save: {
+        url: `${prefix}/content/save`,
+        method: 'POST'
+      },
+      remove: {
+        url: `${prefix}/content/remove`,
         method: 'POST'
       }
     }

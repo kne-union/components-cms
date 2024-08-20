@@ -5,9 +5,9 @@ const { merge } = lodash;
 const { Routes, Route, Navigate } = reactRouter;
 
 const BaseExample = createWithRemoteLoader({
-  modules: ['Global@PureGlobal', 'Global@usePreset', 'Layout']
+  modules: ['Global@PureGlobal', 'Global@usePreset', 'Layout', 'components-ckeditor:Editor']
 })(({ remoteModules }) => {
-  const [PureGlobal, usePreset, Layout] = remoteModules;
+  const [PureGlobal, usePreset, Layout, Editor] = remoteModules;
   const preset = usePreset();
   return (
     <PureGlobal
@@ -19,7 +19,19 @@ const BaseExample = createWithRemoteLoader({
     >
       <Layout navigation={{ isFixed: false }}>
         <Routes>
-          <Route path="/Cms/*" element={<Cms baseUrl="/Cms" />} />
+          <Route
+            path="/Cms/*"
+            element={
+              <Cms
+                baseUrl="/Cms"
+                plugins={{
+                  fields: {
+                    CKEditor: Editor
+                  }
+                }}
+              />
+            }
+          />
           <Route path="*" element={<Navigate to="/Cms" />} />
         </Routes>
       </Layout>

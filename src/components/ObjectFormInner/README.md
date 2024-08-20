@@ -1,10 +1,10 @@
 
-# Field
+# ModelFormInner
 
 
 ### 概述
 
-字段管理
+对象表单
 
 
 ### 示例
@@ -13,12 +13,12 @@
 
 - 这里填写示例标题
 - 这里填写示例说明
-- _Field(@components/Field)
+- _ModelFormInner(@components/ModelFormInner)
 
 ```jsx
-const { default: Field } = _Field;
-const BaseExample = () => {
-  return <Field />;
+const {default:ModelFormInner} = _ModelFormInner;
+const BaseExample = ()=>{
+    return <ModelFormInner />;
 };
 
 render(<BaseExample />);

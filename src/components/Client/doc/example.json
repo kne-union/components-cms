@@ -7,8 +7,8 @@
       "code": "./base.js",
       "scope": [
         {
-          "name": "_Group",
-          "packageName": "@components/Group"
+          "name": "_Client",
+          "packageName": "@components/Client"
         },
         {
           "name": "lodash",

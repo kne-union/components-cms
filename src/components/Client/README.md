@@ -1,10 +1,10 @@
 
-# Cms
+# Client
 
 
 ### 概述
 
-内容管理
+用于使用Cms配置管理展示数据
 
 
 ### 示例
@@ -13,14 +13,13 @@
 
 - 这里填写示例标题
 - 这里填写示例说明
-- _Cms(@components/Cms),reactRouter(react-router-dom),lodash(lodash),_Apis(@components/Apis),remoteLoader(@kne/remote-loader)
+- _Client(@components/Client),lodash(lodash),_Apis(@components/Apis),remoteLoader(@kne/remote-loader)
 
 ```jsx
-const { default: Cms } = _Cms;
+const { default: Client } = _Client;
 const { createWithRemoteLoader } = remoteLoader;
 const { getApis } = _Apis;
 const { merge } = lodash;
-const { Routes, Route, Navigate } = reactRouter;
 
 const BaseExample = createWithRemoteLoader({
   modules: ['Global@PureGlobal', 'Global@usePreset', 'Layout', 'components-ckeditor:Editor']
@@ -35,14 +34,11 @@ const BaseExample = createWithRemoteLoader({
     })}
   >
     <Layout navigation={{ isFixed: false }}>
-      <Routes>
-        <Route path="/Cms/*" element={<Cms baseUrl="/Cms" plugins={{
-          fields: {
-            CKEditor: Editor
-          }
-        }} />} />
-        <Route path="*" element={<Navigate to="/Cms" />} />
-      </Routes>
+      <Client groupCode="homepage" menuFixed={false} plugins={{
+        fields: {
+          CKEditor: Editor
+        }
+      }} />
     </Layout>
   </PureGlobal>);
 });

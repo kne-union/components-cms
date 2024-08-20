@@ -1,12 +1,12 @@
-const { default: Group } = _Group;
+const { default: Client } = _Client;
 const { createWithRemoteLoader } = remoteLoader;
 const { getApis } = _Apis;
 const { merge } = lodash;
 
 const BaseExample = createWithRemoteLoader({
-  modules: ['Global@PureGlobal', 'Global@usePreset', 'Layout']
+  modules: ['Global@PureGlobal', 'Global@usePreset', 'Layout', 'components-ckeditor:Editor']
 })(({ remoteModules }) => {
-  const [PureGlobal, usePreset, Layout] = remoteModules;
+  const [PureGlobal, usePreset, Layout, Editor] = remoteModules;
   const preset = usePreset();
   return (
     <PureGlobal
@@ -17,7 +17,15 @@ const BaseExample = createWithRemoteLoader({
       })}
     >
       <Layout navigation={{ isFixed: false }}>
-        <Group />
+        <Client
+          groupCode="homepage"
+          menuFixed={false}
+          plugins={{
+            fields: {
+              CKEditor: Editor
+            }
+          }}
+        />
       </Layout>
     </PureGlobal>
   );

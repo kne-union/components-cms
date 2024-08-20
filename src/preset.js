@@ -80,7 +80,7 @@ export const globalInit = async () => {
   const componentsCoreRemote = {
     ...registry,
     remote: 'components-core',
-    defaultVersion: '0.1.76'
+    defaultVersion: '0.2.29'
   };
   remoteLoaderPreset({
     remotes: {
@@ -95,6 +95,11 @@ export const globalInit = async () => {
         ...registry,
         remote: 'components-view',
         defaultVersion: '0.1.19'
+      },
+      'components-ckeditor': {
+        ...registry,
+        remote: 'components-ckeditor',
+        defaultVersion: '0.1.2'
       },
       'components-cms':
         process.env.NODE_ENV === 'development'

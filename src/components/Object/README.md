@@ -16,9 +16,9 @@
 - _Model(@components/Model)
 
 ```jsx
-const {default:Model} = _Model;
-const BaseExample = ()=>{
-    return <Model />;
+const { default: Model } = _Model;
+const BaseExample = () => {
+  return <Model />;
 };
 
 render(<BaseExample />);

@@ -37,6 +37,10 @@ const FormInner = createWithRemoteLoader({
           label: '富文本'
         },
         {
+          value: 'file',
+          label: '附件'
+        },
+        {
           value: 'city',
           label: '城市'
         },

@@ -27,24 +27,34 @@ const BaseExample = createWithRemoteLoader({
 })(({ remoteModules }) => {
   const [PureGlobal, usePreset, Layout, Editor] = remoteModules;
   const preset = usePreset();
-  return (<PureGlobal
-    preset={merge({}, preset, {
-      apis: {
-        cms: getApis()
-      }
-    })}
-  >
-    <Layout navigation={{ isFixed: false }}>
-      <Routes>
-        <Route path="/Cms/*" element={<Cms baseUrl="/Cms" plugins={{
-          fields: {
-            CKEditor: Editor
-          }
-        }} />} />
-        <Route path="*" element={<Navigate to="/Cms" />} />
-      </Routes>
-    </Layout>
-  </PureGlobal>);
+  return (
+    <PureGlobal
+      preset={merge({}, preset, {
+        apis: {
+          cms: getApis()
+        }
+      })}
+    >
+      <Layout navigation={{ isFixed: false }}>
+        <Routes>
+          <Route
+            path="/Cms/*"
+            element={
+              <Cms
+                baseUrl="/Cms"
+                plugins={{
+                  fields: {
+                    CKEditor: Editor
+                  }
+                }}
+              />
+            }
+          />
+          <Route path="*" element={<Navigate to="/Cms" />} />
+        </Routes>
+      </Layout>
+    </PureGlobal>
+  );
 });
 
 render(<BaseExample />);

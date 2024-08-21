@@ -43,7 +43,7 @@ const Client = createWithRemoteLoader({
                         pathMatch={(link, { search }) => {
                           const target = new URLSearchParams(link);
                           const current = new URLSearchParams(search);
-                          return target.get('object') === current.get('object');
+                          return !current.get('object') || target.get('object') === current.get('object');
                         }}
                       />
                     ),

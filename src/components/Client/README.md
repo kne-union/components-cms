@@ -26,21 +26,27 @@ const BaseExample = createWithRemoteLoader({
 })(({ remoteModules }) => {
   const [PureGlobal, usePreset, Layout, Editor] = remoteModules;
   const preset = usePreset();
-  return (<PureGlobal
-    preset={merge({}, preset, {
-      apis: {
-        cms: getApis()
-      }
-    })}
-  >
-    <Layout navigation={{ isFixed: false }}>
-      <Client groupCode="homepage" menuFixed={false} plugins={{
-        fields: {
-          CKEditor: Editor
+  return (
+    <PureGlobal
+      preset={merge({}, preset, {
+        apis: {
+          cms: getApis()
         }
-      }} />
-    </Layout>
-  </PureGlobal>);
+      })}
+    >
+      <Layout navigation={{ isFixed: false }}>
+        <Client
+          groupCode="homepage"
+          menuFixed={false}
+          plugins={{
+            fields: {
+              CKEditor: Editor
+            }
+          }}
+        />
+      </Layout>
+    </PureGlobal>
+  );
 });
 
 render(<BaseExample />);

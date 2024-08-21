@@ -11,10 +11,11 @@ const ListOptions = createWithRemoteLoader({
     'components-core:Global@usePreset',
     'components-core:Filter',
     'components-core:Modal@useModal',
-    'components-core:Descriptions'
+    'components-core:Descriptions',
+    'components-core:File@FileLink'
   ]
 })(({ remoteModules, apis, groupCode, objectCode, plugins, children }) => {
-  const [useFormModal, usePreset, Filter, useModal, Descriptions] = remoteModules;
+  const [useFormModal, usePreset, Filter, useModal, Descriptions, FileLink] = remoteModules;
   const ref = useRef(null);
   const [filter, setFilter] = useState([]);
   const { ajax } = usePreset();
@@ -91,6 +92,19 @@ const ListOptions = createWithRemoteLoader({
                   return value ? '是' : '否';
                 }
 
+                if (type === 'file' && value) {
+                  return Array.isArray(value) ? (
+                    value.map(file => (
+                      <FileLink {...file} originName={file.filename}>
+                        查看
+                      </FileLink>
+                    ))
+                  ) : (
+                    <FileLink {...value} originName={value.filename}>
+                      查看
+                    </FileLink>
+                  );
+                }
                 return value;
               };
               if (field.isList && field.type === 'reference') {

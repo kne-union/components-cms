@@ -8,7 +8,7 @@ const ObjectFormInner = createWithRemoteLoader({
   const { List, MultiField } = FormInfo;
 
   const renderItem = ({ fieldName, name, isList, minLength, maxLength, isBlock, rule, type, reference, referenceObject, formInputType }) => {
-    if (isList && type === 'reference' && reference.type === 'inner') {
+    if (isList && type === 'reference' && reference?.type === 'inner') {
       return (
         <Fetch
           {...Object.assign({}, apis.field.getList, {
@@ -28,7 +28,7 @@ const ObjectFormInner = createWithRemoteLoader({
     const formFieldProps = {};
     const Component = Object.assign({}, FormInfo.fields, plugins?.fields)[formInputType] || FormInfo.fields.Input;
 
-    if (type === 'reference' && reference.type === 'outer') {
+    if (type === 'reference' && reference?.type === 'outer') {
       formFieldProps.api = Object.assign({}, apis.content.getList, {
         params: {
           groupCode: reference.groupCode,

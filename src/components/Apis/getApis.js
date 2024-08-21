@@ -105,6 +105,10 @@ const getApis = options => {
         url: `${prefix}/content/getList`,
         method: 'GET'
       },
+      getDetail: {
+        url: `${prefix}/content/getDetail`,
+        method: 'GET'
+      },
       add: {
         url: `${prefix}/content/add`,
         method: 'POST'

@@ -109,7 +109,7 @@ const Group = createWithRemoteLoader({
                         if (resData.code !== 0) {
                           return;
                         }
-                        message.success('修改对象集合成功');
+                        message.success('复制对象集合成功');
                         formModalApi.close();
                         ref.current.reload();
                       }

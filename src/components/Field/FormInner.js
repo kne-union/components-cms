@@ -1,4 +1,5 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
+import useCurrentTypes from './useCurrentTypes';
 
 const FormInner = createWithRemoteLoader({
   modules: ['components-core:FormInfo', 'components-core:FormInfo@useFormContext']
@@ -6,6 +7,8 @@ const FormInner = createWithRemoteLoader({
   const [FormInfo, useFormContext] = remoteModules;
   const { Input, TextArea, AdvancedSelect, Select, Switch, InputNumber, RadioGroup } = FormInfo.fields;
   const { formData, openApi } = useFormContext();
+
+  const currentTypes = useCurrentTypes(plugins?.types);
 
   const typeList = [
     <Switch name="isList" label="是否列表" disabled={isEdit} />,
@@ -15,44 +18,9 @@ const FormInner = createWithRemoteLoader({
       label="类型"
       rule="REQ"
       disabled={isEdit}
-      options={[
-        { value: 'string', label: '字符串' },
-        {
-          value: 'number',
-          label: '数字'
-        },
-        { value: 'boolean', label: '布尔' },
-        { value: 'date', label: '日期' },
-        {
-          value: 'date-range',
-          label: '日期范围'
-        },
-        { value: 'datetime', label: '日期时间' },
-        {
-          value: 'datetime-range',
-          label: '日期时间范围'
-        },
-        {
-          value: 'rich-text',
-          label: '富文本'
-        },
-        {
-          value: 'file',
-          label: '附件'
-        },
-        {
-          value: 'city',
-          label: '城市'
-        },
-        {
-          value: 'industry',
-          label: '行业'
-        },
-        {
-          value: 'reference',
-          label: '引用类型'
-        }
-      ]}
+      options={Array.from(currentTypes).map(([name, { label }]) => {
+        return { value: name, label };
+      })}
     />
   ];
 
@@ -123,25 +91,31 @@ const FormInner = createWithRemoteLoader({
     typeList.push(<InputNumber name="minLength" label="最小长度" />, <InputNumber name="maxLength" label="最大长度" />);
   }
 
+  const referenceSelect = (
+    <Select
+      name="formInputType"
+      label="字段输入类型"
+      rule="REQ"
+      options={(currentTypes.get(formData.type)?.fields || []).map(item => {
+        if (typeof item === 'string') {
+          return { value: item, label: item };
+        }
+
+        return { value: item.field, label: item.field };
+      })}
+    />
+  );
+
   const formList = [<Input name="fieldName" label="字段名" rule="REQ" disabled={isEdit} />];
   if (formData.referenceType === 'outer' || (formData.type === 'reference' && !formData.isList)) {
-    formList.push(<Input name="rule" label="验证规则" />, <Input name="formInputType" label="字段输入类型" value="AdvancedSelect" disabled />);
+    formList.push(<Input name="rule" label="验证规则" />, referenceSelect);
   }
 
   if (formData.type !== 'reference') {
-    formList.push(
-      <Input name="rule" label="验证规则" />,
-      <Select
-        name="formInputType"
-        label="字段输入类型"
-        options={Object.keys(Object.assign({}, FormInfo.fields, plugins?.fields)).map(name => ({
-          value: name,
-          label: name
-        }))}
-      />
-    );
+    formList.push(<Input name="rule" label="验证规则" />, referenceSelect);
   }
   formList.push(<Switch name="isBlock" label="是否块元素" />);
+  formList.push(<Switch name="isHidden" label="是否隐藏元素" />);
   return (
     <>
       <FormInfo

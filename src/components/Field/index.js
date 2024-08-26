@@ -47,3 +47,5 @@ export default Field;
 
 export { ListOptions, getColumns };
 export { default as FormInner } from './FormInner';
+export { default as defaultTypes } from './defaultTypes';
+export { default as useCurrentTypes } from './useCurrentTypes';

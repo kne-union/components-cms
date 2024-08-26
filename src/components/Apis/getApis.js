@@ -7,6 +7,10 @@ const getApis = options => {
         url: `${prefix}/group/add`,
         method: 'POST'
       },
+      copy: {
+        url: `${prefix}/group/copy`,
+        method: 'POST'
+      },
       getList: {
         url: `${prefix}/group/getList`,
         method: 'GET'

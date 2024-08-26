@@ -89,6 +89,35 @@ const Group = createWithRemoteLoader({
                   });
                 }
               },
+              {
+                children: '复制',
+                onClick: () => {
+                  const formModalApi = formModal({
+                    title: '复制对象集合',
+                    size: 'small',
+                    formProps: {
+                      data: Object.assign({}, item, {
+                        name: `${item.name}_copy`,
+                        code: `${item.code}_copy`,
+                      }),
+                      onSubmit: async data => {
+                        const { data: resData } = await ajax(
+                          Object.assign({}, apis.cms.group.copy, {
+                            data: Object.assign({}, data, { copyGroupCode: item.code })
+                          })
+                        );
+                        if (resData.code !== 0) {
+                          return;
+                        }
+                        message.success('复制对象集合成功');
+                        formModalApi.close();
+                        ref.current.reload();
+                      }
+                    },
+                    children: <FormInner />
+                  });
+                }
+              },
               item.status === 0
                 ? {
                     children: '关闭',

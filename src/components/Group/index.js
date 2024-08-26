@@ -114,7 +114,7 @@ const Group = createWithRemoteLoader({
                         ref.current.reload();
                       }
                     },
-                    children: <FormInner />
+                    children: <FormInner isCopy />
                   });
                 }
               },

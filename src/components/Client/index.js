@@ -28,7 +28,7 @@ const Client = createWithRemoteLoader({
                   })}
                   columns={[...columns, optionsColumn]}
                   ref={ref}
-                  name={`cms-client-${groupCode}`}
+                  name={`cms-client-${groupCode}-${objectCode}`}
                   page={{
                     ...props,
                     menu: (

@@ -1,13 +1,15 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import Fetch from '@kne/react-fetch';
+import { useCurrentTypes } from '@components/Field';
 
 const ObjectFormInner = createWithRemoteLoader({
   modules: ['components-core:FormInfo']
 })(({ remoteModules, objectCode, groupCode, apis, plugins = {}, ...props }) => {
   const [FormInfo] = remoteModules;
   const { List, MultiField } = FormInfo;
-
-  const renderItem = ({ fieldName, name, isList, minLength, maxLength, isBlock, rule, type, reference, referenceObject, formInputType }) => {
+  const currentTypes = useCurrentTypes(plugins?.types);
+  const renderItem = field => {
+    const { fieldName, name, isList, minLength, maxLength, isBlock, isHidden, rule, type, reference, referenceObject, formInputType } = field;
     if (isList && type === 'reference' && reference?.type === 'inner') {
       return (
         <Fetch
@@ -24,37 +26,41 @@ const ObjectFormInner = createWithRemoteLoader({
         />
       );
     }
+    const currentType = currentTypes.get(type);
+    const fieldInput = (() => {
+      const target = currentType.fields
+        .map(item => {
+          if (typeof item === 'string') {
+            return { field: item, props: {} };
+          }
+          return item;
+        })
+        .find(item => item.field === formInputType);
+      return target || { field: 'Input', props: {} };
+    })();
 
-    const formFieldProps = {};
-    const Component = Object.assign({}, FormInfo.fields, plugins?.fields)[formInputType] || FormInfo.fields.Input;
-
-    if (type === 'reference' && reference?.type === 'outer') {
-      formFieldProps.api = Object.assign({}, apis.content.getList, {
-        params: {
-          groupCode: reference.groupCode,
-          objectCode: reference.targetObjectCode
-        },
-        transformData: data => {
-          return Object.assign({}, data, {
-            pageData: data.pageData.map(item => {
-              return {
-                value: item.id,
-                label: item[reference.targetObjectFieldLabelCode || 'name']
-              };
+    const formFieldProps = (() => {
+      return Object.assign(
+        {},
+        typeof fieldInput.props === 'function'
+          ? fieldInput.props({
+              field,
+              apis
             })
-          });
-        }
-      });
-    }
+          : fieldInput.props,
+        fieldInput.acceptList
+          ? {
+              single: !isList
+            }
+          : {}
+      );
+    })();
+    const Component = Object.assign({}, FormInfo.fields, plugins?.fields)[fieldInput.field];
 
-    if (!isList && formInputType === 'AdvancedSelect') {
-      formFieldProps.single = true;
+    if (isList && !fieldInput.acceptList) {
+      return <MultiField name={fieldName} label={name} rule={rule} block display={!isHidden} field={Component} />;
     }
-
-    if (isList && type !== 'reference') {
-      return <MultiField name={fieldName} label={name} rule={rule} block field={Component} />;
-    }
-    return <Component name={fieldName} label={name} rule={rule} block={isBlock} {...formFieldProps} />;
+    return <Component name={fieldName} label={name} rule={rule} block={isBlock} display={!isHidden} {...formFieldProps} />;
   };
 
   return (

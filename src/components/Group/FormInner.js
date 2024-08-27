@@ -10,7 +10,7 @@ const FormInner = createWithRemoteLoader({
     <FormInfo
       column={1}
       list={[
-        <Switch display={!!isCopy} name="withContent" label="复制对象数据内容" />,
+        <Switch display={!!isCopy} name="withContent" label="是否复制对象集合数据内容" />,
         <Input name="name" label="名称" rule="REQ" />,
         <Input name="code" label="code" disabled={isEdit} description="缺省按照UUIDV4规则自动生成" />,
         <TextArea name="descrition" label="描述" />

@@ -57,6 +57,10 @@ const getApis = options => {
         url: `${prefix}/object/save`,
         method: 'POST'
       },
+      copy: {
+        url: `${prefix}/object/copy`,
+        method: 'POST'
+      },
       remove: {
         url: `${prefix}/object/remove`,
         method: 'POST'

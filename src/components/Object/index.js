@@ -123,14 +123,14 @@ const Model = createWithRemoteLoader({
                             onSubmit: async data => {
                               const { data: resData } = await ajax(
                                 Object.assign({}, apis.cms.object.copy, {
-                                  data: Object.assign({}, data, { id: item.id })
+                                  data: Object.assign({}, data, { copyId: item.id })
                                 })
                               );
 
                               if (resData.code !== 0) {
                                 return;
                               }
-                              message.success('对象修改成功');
+                              message.success('对象复制成功');
                               formModalApi.close();
                               ref.current.reload();
                             }

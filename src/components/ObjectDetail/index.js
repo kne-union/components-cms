@@ -69,7 +69,7 @@ const ObjectDetail = createWithRemoteLoader({
               />
             }
           >
-            <CurrentComponent baseUrl={baseUrl} objectCode={objectCode} groupCode={groupCode} plugins={plugins} />
+            <CurrentComponent baseUrl={baseUrl} objectCode={objectCode} groupCode={groupCode} plugins={plugins} apis={apis.cms} />
           </StateBarPage>
         );
       }}

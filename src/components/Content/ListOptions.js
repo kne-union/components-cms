@@ -118,7 +118,7 @@ const ListOptions = createWithRemoteLoader({
                   <DisplayFieldValue
                     value={item[name]}
                     field={field}
-                    apis={apis.cms}
+                    apis={apis}
                     plugins={plugins}
                     referenceContents={data.referenceContents}
                     isInline

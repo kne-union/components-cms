@@ -4,9 +4,14 @@ import { useSearchParams } from 'react-router-dom';
 import { ListOptions } from '@components/Content';
 
 const Client = createWithRemoteLoader({
-  modules: ['components-core:Layout@TablePage', 'components-core:Layout@Menu', 'components-core:Global@usePreset']
+  modules: [
+    'components-core:Layout@TablePage',
+    'components-core:Layout@Menu',
+    'components-core:Global@usePreset',
+    'components-core:Filter@getFilterValue'
+  ]
 })(({ remoteModules, baseUrl = '', plugins, groupCode, ...props }) => {
-  const [TablePage, Menu, usePreset] = remoteModules;
+  const [TablePage, Menu, usePreset, getFilterValue] = remoteModules;
   const { apis } = usePreset();
   const [searchParams] = useSearchParams();
   const currentObject = searchParams.get('object');
@@ -20,35 +25,39 @@ const Client = createWithRemoteLoader({
         const objectCode = currentObject || defaultObject.code;
         return (
           <ListOptions apis={apis.cms} groupCode={groupCode} objectCode={objectCode} plugins={plugins}>
-            {({ ref, columns, topOptions, optionsColumn }) => {
+            {({ ref, filter, columns, topOptions, optionsColumn }) => {
               return (
                 <TablePage
                   {...Object.assign({}, apis.cms.content.getList, {
-                    params: { objectCode, groupCode }
+                    params: Object.assign({}, { objectCode, groupCode }, { filter: getFilterValue(filter.value) })
                   })}
                   columns={[...columns, optionsColumn]}
                   ref={ref}
                   name={`cms-client-${groupCode}-${objectCode}`}
-                  page={{
-                    ...props,
-                    menu: (
-                      <Menu
-                        items={data.map(({ name, code }) => {
-                          return {
-                            label: name,
-                            key: code,
-                            path: `${baseUrl}?object=${code}`
-                          };
-                        })}
-                        pathMatch={(link, { search }) => {
-                          const target = new URLSearchParams(link);
-                          const current = new URLSearchParams(search);
-                          return !current.get('object') || target.get('object') === current.get('object');
-                        }}
-                      />
-                    ),
-                    titleExtra: topOptions
-                  }}
+                  page={Object.assign(
+                    {},
+                    props,
+                    {
+                      menu: (
+                        <Menu
+                          items={data.map(({ name, code }) => {
+                            return {
+                              label: name,
+                              key: code,
+                              path: `${baseUrl}?object=${code}`
+                            };
+                          })}
+                          pathMatch={(link, { search }) => {
+                            const target = new URLSearchParams(link);
+                            const current = new URLSearchParams(search);
+                            return !current.get('object') || target.get('object') === current.get('object');
+                          }}
+                        />
+                      ),
+                      titleExtra: topOptions
+                    },
+                    filter.list && filter.list.length > 0 ? { filter } : {}
+                  )}
                 />
               );
             }}

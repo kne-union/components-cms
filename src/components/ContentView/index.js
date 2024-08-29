@@ -4,6 +4,8 @@ import transform from 'lodash/transform';
 import get from 'lodash/get';
 import last from 'lodash/last';
 import DisplayFieldValue from './DisplayFieldValue';
+import { Space } from 'antd';
+import object from '../Object';
 
 const ContentView = createWithRemoteLoader({
   modules: ['components-core:Global@usePreset', 'components-core:InfoPage', 'components-core:Descriptions']
@@ -11,14 +13,14 @@ const ContentView = createWithRemoteLoader({
   const [usePreset, InfoPage, Descriptions] = remoteModules;
   const { apis } = usePreset();
 
-  const renderObjectContent = ({ data, groupCode, objectCode }) => {
+  const renderObjectContent = ({ data, title, groupCode, objectCode }) => {
     return (
       <Fetch
         {...Object.assign({}, apis.cms.object.getMetaInfo, {
           params: { groupCode, objectCode }
         })}
         render={({ data: meta }) => {
-          const { fields, object } = meta;
+          const { fields } = meta;
           const { info, single } = transform(
             fields,
             (result, field) => {
@@ -72,36 +74,45 @@ const ContentView = createWithRemoteLoader({
 
           const renderItem = ({ data, title, index }) => {
             return (
-              <InfoPage.Part key={index} title={title}>
+              <Space direction="vertical">
                 {single && single.length > 0 ? (
-                  <InfoPage.Part>
+                  <InfoPage.Part title={title}>
                     <Descriptions dataSource={transformDataSource({ value: data, fields: single })} />
                   </InfoPage.Part>
                 ) : null}
                 {info && info.length > 0
                   ? info.map(field => {
-                      return (get(data, field.fieldName) || []).map((data, index) => {
-                        return (
-                          <InfoPage.Part key={index} title={`${field.name}${index + 1}`}>
-                            {renderObjectContent({ data, groupCode, objectCode: field.referenceObjectCode })}
-                          </InfoPage.Part>
-                        );
-                      });
+                      return (
+                        <InfoPage.Part title={field.name}>
+                          {(get(data, field.fieldName) || []).map((data, index) => {
+                            return renderObjectContent({
+                              data,
+                              title: `${field.name}${index + 1}`,
+                              groupCode,
+                              objectCode: field.referenceObjectCode
+                            });
+                          })}
+                        </InfoPage.Part>
+                      );
                     })
                   : null}
-              </InfoPage.Part>
+              </Space>
             );
           };
 
-          return Array.isArray(data)
-            ? data.map((data, index) =>
+          return Array.isArray(data) ? (
+            <Space direction="vertical">
+              {data.map((data, index) =>
                 renderItem({
                   data,
-                  title: `${object.name}${index + 1}`,
+                  title,
                   index
                 })
-              )
-            : renderItem({ data });
+              )}
+            </Space>
+          ) : (
+            renderItem({ data, title })
+          );
         }}
       />
     );

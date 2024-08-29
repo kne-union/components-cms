@@ -1,10 +1,12 @@
 import RemoteLoader from '@kne/remote-loader';
 import ContentView from '@components/ContentView';
+import { useCurrentTypes } from '@components/Field';
 import get from 'lodash/get';
 import Fetch from '@kne/react-fetch';
 import isNil from 'lodash/isNil';
 
 const DisplayFieldValue = ({ value, field, apis, referenceContents, isInline, plugins }) => {
+  const currentTypes = useCurrentTypes(plugins?.types);
   const format = ({ value, field }) => {
     if (isNil(value)) {
       return value;
@@ -27,9 +29,9 @@ const DisplayFieldValue = ({ value, field, apis, referenceContents, isInline, pl
         />
       );
     }
-
-    if (get(plugins.renders, field.type)) {
-      return get(plugins.renders, field.type)({ value, isInline });
+    const targetType = currentTypes.get(field.type);
+    if (targetType && targetType.render) {
+      return targetType.render({ value, isInline, field });
     }
     if (field.type === 'industry') {
       return <RemoteLoader module="components-core:Common@IndustryEnum" name={value} />;
@@ -38,9 +40,6 @@ const DisplayFieldValue = ({ value, field, apis, referenceContents, isInline, pl
       return value ? '是' : '否';
     }
     if (field.type === 'file') {
-      if (!value) {
-        return;
-      }
       return Array.isArray(value) ? (
         value.map(file => (
           <RemoteLoader module="components-core:File@FileLink" {...file} type="link" originName={file.filename}>
@@ -53,7 +52,6 @@ const DisplayFieldValue = ({ value, field, apis, referenceContents, isInline, pl
         </RemoteLoader>
       );
     }
-
     return value;
   };
 

@@ -1,8 +1,11 @@
+import dayjs from 'dayjs';
+
 const defaultTypes = new Map([
   [
     'string',
     {
       fields: ['Input', 'Password', 'TextArea', 'InputUpperCase'],
+      filter: 'InputFilterItem',
       label: '字符串'
     }
   ],
@@ -10,6 +13,7 @@ const defaultTypes = new Map([
     'number',
     {
       fields: ['InputNumber', 'Rate', 'Slider'],
+      filter: 'NumberRangeFilterItem',
       label: '数字'
     }
   ],
@@ -28,6 +32,22 @@ const defaultTypes = new Map([
           }
         }
       ],
+      filter: {
+        name: 'AdvancedSelectFilterItem',
+        props: {
+          single: true,
+          api: {
+            loader: () => {
+              return {
+                pageData: [
+                  { value: true, label: '是' },
+                  { value: false, label: '否' }
+                ]
+              };
+            }
+          }
+        }
+      },
       label: '布尔'
     }
   ],
@@ -42,7 +62,11 @@ const defaultTypes = new Map([
           }
         }
       ],
-      label: '日期'
+      filter: 'TypeDateRangePickerFilterItem',
+      label: '日期',
+      render: ({ value }) => {
+        return dayjs(value).format('YYYY-MM-DD');
+      }
     }
   ],
   [
@@ -57,6 +81,7 @@ const defaultTypes = new Map([
           }
         }
       ],
+      filter: 'TypeDateRangePickerFilterItem',
       label: '日期时间'
     }
   ],
@@ -100,6 +125,7 @@ const defaultTypes = new Map([
           }
         }
       ],
+      filter: 'InputFilterItem',
       label: '电话'
     }
   ],
@@ -112,6 +138,7 @@ const defaultTypes = new Map([
           acceptList: true
         }
       ],
+      filter: 'CityFilterItem',
       label: '城市'
     }
   ],
@@ -124,6 +151,7 @@ const defaultTypes = new Map([
           acceptList: true
         }
       ],
+      filter: 'IndustrySelectFilterItem',
       label: '行业'
     }
   ],
@@ -178,6 +206,30 @@ const defaultTypes = new Map([
           }
         }
       ],
+      filter: {
+        name: 'AdvancedSelectFilterItem',
+        props: ({ apis, field }) => {
+          const { reference } = field;
+          return {
+            api: Object.assign({}, apis.content.getList, {
+              params: {
+                groupCode: reference.groupCode,
+                objectCode: reference.targetObjectCode
+              },
+              transformData: data => {
+                return Object.assign({}, data, {
+                  pageData: data.pageData.map(item => {
+                    return {
+                      value: item.id,
+                      label: item[field.referenceFieldLabelCode]
+                    };
+                  })
+                });
+              }
+            })
+          };
+        }
+      },
       label: '引用类型'
     }
   ]

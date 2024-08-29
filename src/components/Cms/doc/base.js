@@ -30,18 +30,16 @@ const BaseExample = createWithRemoteLoader({
                       'rich-text',
                       {
                         fields: ['CKEditor'],
-                        label: '富文本'
+                        label: '富文本',
+                        render: ({ value, isInline }) => {
+                          if (isInline) {
+                            return (value || '').replace(/<[^>]+>/g, '');
+                          }
+                          return <Editor.Content value={value} />;
+                        }
                       }
                     ]
                   ],
-                  renders: {
-                    'rich-text': ({ value, isInline }) => {
-                      if (isInline) {
-                        return (value || '').replace(/<[^>]+>/g, '');
-                      }
-                      return <Editor.Content value={value} />;
-                    }
-                  },
                   fields: {
                     CKEditor: Editor
                   }

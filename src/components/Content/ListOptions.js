@@ -1,10 +1,10 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useRef, useState } from 'react';
-import { Space, Button, App, Flex } from 'antd';
+import { Space, Button, App } from 'antd';
 import Fetch from '@kne/react-fetch';
 import ObjectFormInner from '@components/ObjectFormInner';
 import ContentView, { DisplayFieldValue } from '@components/ContentView';
-import get from 'lodash/get';
+import { useCurrentTypes } from '@components/Field';
 
 const ListOptions = createWithRemoteLoader({
   modules: [
@@ -23,19 +23,53 @@ const ListOptions = createWithRemoteLoader({
   const formModal = useFormModal();
   const modal = useModal();
   const { message } = App.useApp();
-
+  const currentTypes = useCurrentTypes(plugins?.types);
   return (
     <Fetch
       {...Object.assign({}, apis.object.getMetaInfo, {
         params: { groupCode, objectCode }
       })}
       render={({ data: metaInfo }) => {
+        const filterList = metaInfo.fields
+          .filter(field => {
+            const currentType = currentTypes.get(field.type);
+            return field.referenceType !== 'inner' && field.isIndexed && !!currentType.filter;
+          })
+          .map(field => {
+            const currentType = currentTypes.get(field.type);
+            const filter = (() => {
+              if (typeof currentType.filter === 'string') {
+                return {
+                  name: currentType.filter,
+                  props: {}
+                };
+              }
+              return currentType.filter;
+            })();
+            const FilterItem = Filter.fields[filter.name];
+
+            return (
+              <FilterItem
+                name={field.code}
+                label={field.name}
+                {...Object.assign(
+                  {},
+                  typeof filter.props === 'function'
+                    ? filter.props({
+                        apis,
+                        field
+                      })
+                    : filter.props
+                )}
+              />
+            );
+          });
         return children({
           ref,
           filter: {
             value: filter,
             onChange: setFilter,
-            list: []
+            list: filterList.length > 0 ? [filterList] : []
           },
           topOptions: (
             <Space>
@@ -75,25 +109,11 @@ const ListOptions = createWithRemoteLoader({
           columns: metaInfo.fields
             .filter(({ isHidden }) => !isHidden)
             .map(field => {
-              const getColumnType = field => {
-                if (field.type === 'date-range') {
-                  return 'dateRange';
-                }
-                if (field.type === 'date') {
-                  return 'date';
-                }
-
-                if (field.type === 'datetime') {
-                  return 'datetime';
-                }
-
-                return 'other';
-              };
               return {
                 name: field.fieldName,
                 title: field.name,
                 ellipsis: true,
-                type: getColumnType(field),
+                type: 'other',
                 valueOf: (item, { name, data }) => (
                   <DisplayFieldValue
                     value={item[name]}

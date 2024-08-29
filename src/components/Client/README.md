@@ -39,16 +39,22 @@ const BaseExample = createWithRemoteLoader({
           groupCode="homepage"
           menuFixed={false}
           plugins={{
-            types: [['rich-text', {
-              fields: ['CKEditor'], label: '富文本'
-            }]], renders: {
-              'rich-text': ({ value, isInline }) => {
-                if (isInline) {
-                  return (value || '').replace(/<[^>]+>/g, '');
+            types: [
+              [
+                'rich-text',
+                {
+                  fields: ['CKEditor'],
+                  label: '富文本',
+                  render: ({ value, isInline }) => {
+                    if (isInline) {
+                      return (value || '').replace(/<[^>]+>/g, '');
+                    }
+                    return <Editor.Content value={value} />;
+                  }
                 }
-                return <Editor.Content value={value} />;
-              }
-            }, fields: {
+              ]
+            ],
+            fields: {
               CKEditor: Editor
             }
           }}

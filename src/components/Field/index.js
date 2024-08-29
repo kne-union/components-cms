@@ -6,12 +6,11 @@ import { useNavigate } from 'react-router-dom';
 
 const Field = createWithRemoteLoader({
   modules: ['components-core:Table@TablePage', 'components-core:Global@usePreset']
-})(({ remoteModules, groupCode, objectCode, plugins = {}, baseUrl = '' }) => {
+})(({ remoteModules, groupCode, apis, objectCode, plugins = {}, baseUrl = '' }) => {
   const [TablePage, usePreset] = remoteModules;
-  const { apis } = usePreset();
   const navigate = useNavigate();
   return (
-    <ListOptions apis={apis.cms} groupCode={groupCode} objectCode={objectCode} plugins={plugins} topOptionsSize="small">
+    <ListOptions apis={apis} groupCode={groupCode} objectCode={objectCode} plugins={plugins} topOptionsSize="small">
       {({ ref, topOptions, optionsColumn }) => (
         <Flex vertical gap={8} flex={1}>
           <Flex justify="space-between">
@@ -19,7 +18,7 @@ const Field = createWithRemoteLoader({
             {topOptions}
           </Flex>
           <TablePage
-            {...Object.assign({}, apis.cms.field.getList, {
+            {...Object.assign({}, apis.field.getList, {
               params: { objectCode, groupCode }
             })}
             ref={ref}

@@ -10,25 +10,26 @@ const Client = createWithRemoteLoader({
     'components-core:Global@usePreset',
     'components-core:Filter@getFilterValue'
   ]
-})(({ remoteModules, baseUrl = '', plugins, groupCode, ...props }) => {
+})(({ remoteModules, baseUrl = '', apis: apisProps, plugins, groupCode, ...props }) => {
   const [TablePage, Menu, usePreset, getFilterValue] = remoteModules;
-  const { apis } = usePreset();
+  const { apis: presetApis } = usePreset();
   const [searchParams] = useSearchParams();
   const currentObject = searchParams.get('object');
+  const apis = Object.assign({}, presetApis?.cms, apisProps);
   return (
     <Fetch
-      {...Object.assign({}, apis.cms.object.getList, {
+      {...Object.assign({}, apis.object.getList, {
         params: { groupCode }
       })}
       render={({ data }) => {
         const defaultObject = data[0];
         const objectCode = currentObject || defaultObject.code;
         return (
-          <ListOptions apis={apis.cms} groupCode={groupCode} objectCode={objectCode} plugins={plugins}>
+          <ListOptions apis={apis} groupCode={groupCode} objectCode={objectCode} plugins={plugins}>
             {({ ref, filter, columns, topOptions, optionsColumn }) => {
               return (
                 <TablePage
-                  {...Object.assign({}, apis.cms.content.getList, {
+                  {...Object.assign({}, apis.content.getList, {
                     params: Object.assign({}, { objectCode, groupCode }, { filter: getFilterValue(filter.value) })
                   })}
                   columns={[...columns, optionsColumn]}

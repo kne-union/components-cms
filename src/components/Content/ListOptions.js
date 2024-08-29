@@ -1,9 +1,10 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useRef, useState } from 'react';
-import { Space, Button, App, Flex } from 'antd';
+import { Space, Button, App } from 'antd';
 import Fetch from '@kne/react-fetch';
 import ObjectFormInner from '@components/ObjectFormInner';
-import get from 'lodash/get';
+import ContentView, { DisplayFieldValue } from '@components/ContentView';
+import { useCurrentTypes } from '@components/Field';
 
 const ListOptions = createWithRemoteLoader({
   modules: [
@@ -22,19 +23,53 @@ const ListOptions = createWithRemoteLoader({
   const formModal = useFormModal();
   const modal = useModal();
   const { message } = App.useApp();
-
+  const currentTypes = useCurrentTypes(plugins?.types);
   return (
     <Fetch
       {...Object.assign({}, apis.object.getMetaInfo, {
         params: { groupCode, objectCode }
       })}
       render={({ data: metaInfo }) => {
+        const filterList = metaInfo.fields
+          .filter(field => {
+            const currentType = currentTypes.get(field.type);
+            return field.referenceType !== 'inner' && field.isIndexed && !!currentType.filter;
+          })
+          .map(field => {
+            const currentType = currentTypes.get(field.type);
+            const filter = (() => {
+              if (typeof currentType.filter === 'string') {
+                return {
+                  name: currentType.filter,
+                  props: {}
+                };
+              }
+              return currentType.filter;
+            })();
+            const FilterItem = Filter.fields[filter.name];
+
+            return (
+              <FilterItem
+                name={field.code}
+                label={field.name}
+                {...Object.assign(
+                  {},
+                  typeof filter.props === 'function'
+                    ? filter.props({
+                        apis,
+                        field
+                      })
+                    : filter.props
+                )}
+              />
+            );
+          });
         return children({
           ref,
           filter: {
             value: filter,
             onChange: setFilter,
-            list: []
+            list: filterList.length > 0 ? [filterList] : []
           },
           topOptions: (
             <Space>
@@ -42,7 +77,7 @@ const ListOptions = createWithRemoteLoader({
                 type="primary"
                 onClick={() => {
                   const formModalApi = formModal({
-                    title: '添加数据',
+                    title: `添加${metaInfo.object.name}`,
                     formProps: {
                       onSubmit: async data => {
                         const { data: resData } = await ajax(
@@ -57,7 +92,7 @@ const ListOptions = createWithRemoteLoader({
                         if (resData.code !== 0) {
                           return;
                         }
-                        message.success('添加数据成功');
+                        message.success(`添加${metaInfo.object.name}成功`);
                         ref.current.reload();
                         formModalApi.close();
                       }
@@ -66,136 +101,60 @@ const ListOptions = createWithRemoteLoader({
                   });
                 }}
               >
-                添加数据
+                添加{metaInfo.object.name}
               </Button>
             </Space>
           ),
           metaInfo,
-          columns: metaInfo.fields.map(field => {
-            const getColumnType = field => {
-              if (field.type === 'date-range') {
-                return 'dateRange';
-              }
-              if (field.type === 'date') {
-                return 'date';
-              }
-
-              if (field.type === 'datetime') {
-                return 'datetime';
-              }
-
-              return 'other';
-            };
-            const getColumnValueOf = field => {
-              const format = ({ value, type }) => {
-                if (type === 'boolean') {
-                  return value ? '是' : '否';
-                }
-
-                if (type === 'file' && value) {
-                  return Array.isArray(value) ? (
-                    value.map(file => (
-                      <FileLink {...file} originName={file.filename}>
-                        查看
-                      </FileLink>
-                    ))
-                  ) : (
-                    <FileLink {...value} originName={value.filename}>
-                      查看
-                    </FileLink>
-                  );
-                }
-                return value;
+          columns: metaInfo.fields
+            .filter(({ isHidden }) => !isHidden)
+            .map(field => {
+              return {
+                name: field.fieldName,
+                title: field.name,
+                ellipsis: true,
+                type: 'other',
+                valueOf: (item, { name, data }) => (
+                  <DisplayFieldValue
+                    value={item[name]}
+                    field={field}
+                    apis={apis.cms}
+                    plugins={plugins}
+                    referenceContents={data.referenceContents}
+                    isInline
+                  />
+                )
               };
-              if (field.isList && field.type === 'reference') {
-                return (item, { name }) => (
-                  <Button
-                    type="link"
-                    onClick={() => {
-                      const renderValue = (value, index) => {
-                        return (
-                          <Fetch
-                            {...Object.assign({}, apis.field.getList, {
-                              params: { groupCode, objectCode: field.referenceObjectCode }
-                            })}
-                            render={({ data: fields }) => {
-                              const dataSource = [];
-                              fields
-                                .map(({ name, fieldName }) => {
-                                  return {
-                                    label: name,
-                                    content: get(value, fieldName)
-                                  };
-                                })
-                                .forEach((target, index) => {
-                                  const currentIndex = Math.floor(index / 2);
-                                  if (!dataSource[currentIndex]) {
-                                    dataSource[currentIndex] = [];
-                                  }
-                                  dataSource[currentIndex].push(target);
-                                });
-                              return (
-                                <div>
-                                  <Descriptions dataSource={dataSource} key={index} />
-                                </div>
-                              );
-                            }}
-                          />
-                        );
-                      };
-                      modal({
-                        title: field.name,
-                        children: (
-                          <Flex vertical gap={8}>
-                            {item[name].map(renderValue)}
-                          </Flex>
-                        )
-                      });
-                    }}
-                  >
-                    查看
-                  </Button>
-                );
-              }
-              if (field.isList) {
-                return (item, { name }) => {
-                  const list = item[name];
-                  if (!list) {
-                    return null;
-                  }
-                  return list
-                    .map(value => {
-                      return format({ value, type: field.type });
-                    })
-                    .join(',');
-                };
-              }
-
-              return (item, { name }) => {
-                return format({ value: item[name], type: field.type });
-              };
-            };
-
-            return {
-              name: field.fieldName,
-              title: field.name,
-              ellipsis: true,
-              type: getColumnType(field),
-              valueOf: getColumnValueOf(field)
-            };
-          }),
+            }),
           optionsColumn: {
             name: 'options',
             title: '操作',
             type: 'options',
             fixed: 'right',
-            valueOf: item => {
+            valueOf: (item, { data }) => {
               return [
+                {
+                  children: '查看',
+                  onClick: () => {
+                    modal({
+                      title: metaInfo.object.name,
+                      children: (
+                        <ContentView
+                          data={item}
+                          groupCode={groupCode}
+                          objectCode={objectCode}
+                          referenceContents={data.referenceContents}
+                          plugins={plugins}
+                        />
+                      )
+                    });
+                  }
+                },
                 {
                   children: '编辑',
                   onClick: () => {
                     const formModalApi = formModal({
-                      title: '编辑数据',
+                      title: `编辑${metaInfo.object.name}`,
                       formProps: {
                         data: Object.assign({}, item),
                         onSubmit: async data => {
@@ -207,7 +166,7 @@ const ListOptions = createWithRemoteLoader({
                           if (resData.code !== 0) {
                             return;
                           }
-                          message.success('保存数据成功');
+                          message.success(`保存${metaInfo.object.name}成功`);
                           ref.current.reload();
                           formModalApi.close();
                         }
@@ -229,7 +188,7 @@ const ListOptions = createWithRemoteLoader({
                       return;
                     }
 
-                    message.success('删除数据成功');
+                    message.success(`删除${metaInfo.object.name}成功`);
                     ref.current.reload();
                   }
                 }

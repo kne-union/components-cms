@@ -109,6 +109,36 @@ const Model = createWithRemoteLoader({
                         });
                       }
                     },
+                    {
+                      children: '复制',
+                      onClick: () => {
+                        const formModalApi = formModal({
+                          title: '复制对象',
+                          size: 'small',
+                          formProps: {
+                            data: Object.assign({}, item, {
+                              name: `${item.name}_copy`,
+                              code: `${item.code}_copy`,
+                            }),
+                            onSubmit: async data => {
+                              const { data: resData } = await ajax(
+                                Object.assign({}, apis.cms.object.copy, {
+                                  data: Object.assign({}, data, { copyId: item.id })
+                                })
+                              );
+
+                              if (resData.code !== 0) {
+                                return;
+                              }
+                              message.success('对象复制成功');
+                              formModalApi.close();
+                              ref.current.reload();
+                            }
+                          },
+                          children: <FormInner isCopy />
+                        });
+                      }
+                    },
                     item.status === 0
                       ? {
                           children: '关闭',

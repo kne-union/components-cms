@@ -7,10 +7,31 @@ const getColumns = ({ navigateTo }) => {
       onClick: ({ colItem }) => navigateTo(colItem)
     },
     {
+      name: 'type',
+      title: '类型',
+      type: 'tag',
+      valueOf: (item, { name }) => {
+        if (item[name] === 'inner') {
+          return { type: 'info', text: '内部' };
+        }
+        if (item[name] === 'outer') {
+          return { type: 'success', text: '外部' };
+        }
+      }
+    },
+    {
       name: 'code',
       title: 'code',
       type: 'mainInfo',
       onClick: ({ colItem }) => navigateTo(colItem)
+    },
+    {
+      name: 'tag',
+      title: '标签',
+      type: 'tag',
+      valueOf: (item, { name }) => {
+        return item[name] && { text: item[name] };
+      }
     },
     {
       name: 'status',

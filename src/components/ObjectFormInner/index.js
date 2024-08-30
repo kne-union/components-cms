@@ -6,11 +6,11 @@ const ObjectFormInner = createWithRemoteLoader({
   modules: ['components-core:FormInfo']
 })(({ remoteModules, objectCode, groupCode, apis, plugins = {}, ...props }) => {
   const [FormInfo] = remoteModules;
-  const { List, MultiField } = FormInfo;
+  const { List, TableList, MultiField } = FormInfo;
   const currentTypes = useCurrentTypes(plugins?.types);
   const renderItem = field => {
     const { fieldName, name, isList, minLength, maxLength, isBlock, isHidden, rule, type, reference, referenceObject, formInputType } = field;
-    if (isList && type === 'reference' && reference?.type === 'inner') {
+    if (type === 'reference' && reference?.type === 'inner') {
       return (
         <Fetch
           {...Object.assign({}, apis.field.getList, {
@@ -21,7 +21,17 @@ const ObjectFormInner = createWithRemoteLoader({
             if (!(Array.isArray(data) && data.length > 0)) {
               return null;
             }
-            return <List title={name} name={fieldName} maxLength={maxLength} minLength={minLength} list={data.map(renderItem)} />;
+            if (isList) {
+              const listType = { List, TableList };
+              const ListComponent = listType[formInputType] || List;
+              return <ListComponent title={name} name={fieldName} maxLength={maxLength} minLength={minLength} list={data.map(renderItem)} />;
+            }
+            return (
+              <FormInfo
+                title={name}
+                list={data.map(field => renderItem(Object.assign({}, field, { fieldName: `${fieldName}.${field.fieldName}` })))}
+              />
+            );
           }}
         />
       );

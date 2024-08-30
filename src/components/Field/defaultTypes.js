@@ -10,6 +10,16 @@ const defaultTypes = new Map([
     }
   ],
   [
+    'secret',
+    {
+      fields: ['Input', 'Password', 'TextArea'],
+      label: '密钥',
+      render: ({ value }) => {
+        return value ? '******' : '-';
+      }
+    }
+  ],
+  [
     'number',
     {
       fields: ['InputNumber', 'Rate', 'Slider'],
@@ -65,7 +75,7 @@ const defaultTypes = new Map([
       filter: 'TypeDateRangePickerFilterItem',
       label: '日期',
       render: ({ value }) => {
-        return dayjs(value).format('YYYY-MM-DD');
+        return value ? dayjs(value).format('YYYY-MM-DD') : '-';
       }
     }
   ],
@@ -82,7 +92,10 @@ const defaultTypes = new Map([
         }
       ],
       filter: 'TypeDateRangePickerFilterItem',
-      label: '日期时间'
+      label: '日期时间',
+      render: ({ value }) => {
+        return value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-';
+      }
     }
   ],
   [

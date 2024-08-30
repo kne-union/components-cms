@@ -84,14 +84,20 @@ const ContentView = createWithRemoteLoader({
                   ? info.map(field => {
                       return (
                         <InfoPage.Part title={field.name}>
-                          {(get(data, field.fieldName) || []).map((data, index) => {
-                            return renderObjectContent({
-                              data,
-                              title: `${field.name}${index + 1}`,
-                              groupCode,
-                              objectCode: field.referenceObjectCode
-                            });
-                          })}
+                          {field.isList
+                            ? (get(data, field.fieldName) || []).map((data, index) => {
+                                return renderObjectContent({
+                                  data,
+                                  title: `${field.name}${index + 1}`,
+                                  groupCode,
+                                  objectCode: field.referenceObjectCode
+                                });
+                              })
+                            : renderObjectContent({
+                                data: get(data, field.fieldName),
+                                groupCode,
+                                objectCode: field.referenceObjectCode
+                              })}
                         </InfoPage.Part>
                       );
                     })

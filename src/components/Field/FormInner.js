@@ -11,8 +11,6 @@ const FormInner = createWithRemoteLoader({
   const currentTypes = useCurrentTypes(plugins?.types);
 
   const typeList = [
-    <Switch name="isList" label="是否列表" disabled={isEdit} />,
-    <Switch name="isIndexed" label="是否为索引字段" display={!formData.isList} disabled={isEdit} />,
     <Select
       name="type"
       label="类型"
@@ -23,24 +21,6 @@ const FormInner = createWithRemoteLoader({
       })}
     />
   ];
-
-  if (formData.type === 'reference' && formData.isList) {
-    typeList.push(
-      <RadioGroup
-        name="referenceType"
-        label="引用方式"
-        rule="REQ"
-        disabled={isEdit}
-        options={[
-          { value: 'inner', label: '内部引用' },
-          {
-            value: 'outer',
-            label: '外部引用'
-          }
-        ]}
-      />
-    );
-  }
 
   if (formData.type === 'reference') {
     typeList.push(
@@ -60,11 +40,24 @@ const FormInner = createWithRemoteLoader({
         label="引用对象"
         rule="REQ"
         single
+      />,
+      <RadioGroup
+        name="referenceType"
+        label="引用方式"
+        rule="REQ"
+        disabled={isEdit}
+        options={[
+          { value: 'inner', label: '内部引用' },
+          {
+            value: 'outer',
+            label: '外部引用'
+          }
+        ]}
       />
     );
   }
 
-  if (formData.referenceObjectCode) {
+  if (formData.referenceType === 'outer' && formData.referenceObjectCode) {
     typeList.push(
       <AdvancedSelect
         disabled={isEdit}
@@ -86,9 +79,12 @@ const FormInner = createWithRemoteLoader({
       />
     );
   }
-
+  typeList.push(<Switch name="isList" label="是否列表" disabled={isEdit} />);
   if (formData.isList) {
     typeList.push(<InputNumber name="minLength" label="最小长度" />, <InputNumber name="maxLength" label="最大长度" />);
+  }
+  if (formData.referenceType !== 'inner' && formData.type !== 'secret') {
+    typeList.push(<Switch name="isIndexed" label="是否为索引字段" disabled={isEdit} />);
   }
 
   const referenceSelect = (
@@ -107,12 +103,21 @@ const FormInner = createWithRemoteLoader({
   );
 
   const formList = [<Input name="fieldName" label="字段名" rule="REQ" disabled={isEdit} />];
-  if (formData.referenceType === 'outer' || (formData.type === 'reference' && !formData.isList)) {
+  if (formData.referenceType !== 'inner') {
     formList.push(<Input name="rule" label="验证规则" />, referenceSelect);
   }
-
-  if (formData.type !== 'reference') {
-    formList.push(<Input name="rule" label="验证规则" />, referenceSelect);
+  if (formData.referenceType === 'inner' && formData.isList) {
+    formList.push(
+      <Select
+        name="formInputType"
+        label="列表类型"
+        rule="REQ"
+        options={[
+          { value: 'List', label: 'List' },
+          { value: 'TableList', label: 'TableList' }
+        ]}
+      />
+    );
   }
   formList.push(<Switch name="isBlock" label="是否块元素" />);
   formList.push(<Switch name="isHidden" label="是否隐藏元素" />);

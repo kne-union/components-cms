@@ -72,6 +72,14 @@ const getApis = options => {
       open: {
         url: `${prefix}/object/open`,
         method: 'POST'
+      },
+      moveUp: {
+        url: `${prefix}/object/moveUp`,
+        method: 'POST'
+      },
+      moveDown: {
+        url: `${prefix}/object/moveDown`,
+        method: 'POST'
       }
     },
     field: {

@@ -19,7 +19,7 @@ const Client = createWithRemoteLoader({
   return (
     <Fetch
       {...Object.assign({}, apis.object.getList, {
-        params: { groupCode }
+        params: { groupCode, filter: { type: 'outer' } }
       })}
       render={({ data }) => {
         const defaultObject = data[0];

@@ -24,6 +24,17 @@ const FormInner = createWithRemoteLoader({
             { value: 'inner', label: '内部' }
           ]}
         />,
+        <RadioGroup
+          name="isSingle"
+          label="是否单例"
+          options={[
+            {
+              value: true,
+              label: '是'
+            },
+            { value: false, label: '否' }
+          ]}
+        />,
         <Input name="code" label="code" disabled={isEdit} description="缺省按照UUIDV4规则自动生成" />,
         <Input name="tag" label="标签" />,
         <TextArea name="descrition" label="描述" />

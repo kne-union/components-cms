@@ -94,7 +94,7 @@ export const globalInit = async () => {
       'components-view': {
         ...registry,
         remote: 'components-view',
-        defaultVersion: '0.1.19'
+        defaultVersion: '0.1.33'
       },
       'components-ckeditor': {
         ...registry,

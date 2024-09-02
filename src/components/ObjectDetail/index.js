@@ -1,7 +1,7 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import Fetch from '@kne/react-fetch';
-import { Space, Button } from 'antd';
+import { Button, Flex } from 'antd';
 import Field from '@components/Field';
 import Content from '@components/Content';
 
@@ -14,16 +14,17 @@ const ObjectDetail = createWithRemoteLoader({
   modules: [
     'components-core:Layout@StateBarPage',
     'components-core:Global@usePreset',
-    'components-view:PageHeader@PageHeaderInner',
-    'components-core:Icon'
+    'components-view:PageHeader',
+    'components-core:Icon',
+    'components-core:StateTag'
   ]
 })(({ remoteModules, baseUrl = '', plugins }) => {
-  const [StateBarPage, usePreset, PageHeader, Icon] = remoteModules;
+  const [StateBarPage, usePreset, PageHeader, Icon, StateTag] = remoteModules;
   const [searchParams, setSearchParams] = useSearchParams();
   const objectCode = searchParams.get('object');
   const groupCode = searchParams.get('group');
   const navigate = useNavigate();
-  const { apis, ajax } = usePreset();
+  const { apis } = usePreset();
   const activeKey = searchParams.get('tab') || 'object';
   if (!(objectCode && groupCode)) {
     return <Navigate to="/404" />;
@@ -39,6 +40,7 @@ const ObjectDetail = createWithRemoteLoader({
         }
       })}
       render={({ data }) => {
+        const { code, status, isSingle, tag, type } = data;
         return (
           <StateBarPage
             stateBar={{
@@ -49,23 +51,54 @@ const ObjectDetail = createWithRemoteLoader({
               },
               stateOption: [
                 { tab: '对象', key: 'object' },
-                { tab: '数据', key: 'data' } /*, { tab: '视图', key: 'view' }*/
+                {
+                  tab: '数据',
+                  key: 'data'
+                }
               ]
             }}
             header={
               <PageHeader
-                title={
-                  <Space size="large">
-                    <Button
-                      onClick={() => {
-                        navigate(`${baseUrl}/object?group=${data.group.code}`);
-                      }}
-                      icon={<Icon type="arrow-bold-left" />}
-                    />
-                    <span>{data.name}</span>
-                  </Space>
+                addonBefore={
+                  <Button
+                    onClick={() => {
+                      navigate(`${baseUrl}/object?group=${data.group.code}`);
+                    }}
+                    icon={<Icon type="arrow-bold-left" />}
+                  />
                 }
-                info={data.group.name}
+                title={data.name}
+                info={`${code} (${data.group.name})`}
+                tags={[
+                  <StateTag
+                    {...(() => {
+                      if (status === 0) {
+                        return { type: 'success', text: '正常' };
+                      }
+                      if (status === 10) {
+                        return { type: 'danger', text: '已关闭' };
+                      }
+                      return { text: '其他' };
+                    })()}
+                  />,
+                  <StateTag
+                    {...(() => {
+                      if (isSingle) {
+                        return { type: 'success', text: '单例' };
+                      }
+                      return { type: 'info', text: '列表' };
+                    })()}
+                  />,
+                  <StateTag
+                    {...(() => {
+                      if (type === 'inner') {
+                        return { type: 'info', text: '内部' };
+                      }
+                      return { type: 'success', text: '外部' };
+                    })()}
+                  />,
+                  ...(tag ? [<StateTag text={tag} />] : [])
+                ]}
               />
             }
           >

@@ -1,5 +1,5 @@
 import { createWithRemoteLoader } from '@kne/remote-loader';
-import ListOptions from './ListOptions';
+import PageOptions from './PageOptions';
 import { Flex } from 'antd';
 import style from './style.module.scss';
 
@@ -9,8 +9,21 @@ const Content = createWithRemoteLoader({
   const [TablePage, Filter] = remoteModules;
   const { getFilterValue } = Filter;
   return (
-    <ListOptions apis={apis} groupCode={groupCode} objectCode={objectCode} plugins={plugins} topOptionsSize="small">
-      {({ ref, filter, topOptions, columns, optionsColumn }) => {
+    <PageOptions apis={apis} groupCode={groupCode} objectCode={objectCode} plugins={plugins} topOptionsSize="small">
+      {({ ref, isSingle, page }) => {
+        if (isSingle) {
+          const { topOptions, children } = page;
+          return (
+            <Flex vertical gap={8} flex={1}>
+              <Flex justify="space-between">
+                <div></div>
+                {topOptions}
+              </Flex>
+              <div>{children}</div>
+            </Flex>
+          );
+        }
+        const { filter, topOptions, columns, optionsColumn } = page;
         return (
           <Flex vertical gap={8} flex={1}>
             {filter.list && filter.list.length > 0 ? (
@@ -33,9 +46,9 @@ const Content = createWithRemoteLoader({
           </Flex>
         );
       }}
-    </ListOptions>
+    </PageOptions>
   );
 });
 
 export default Content;
-export { ListOptions };
+export { PageOptions };

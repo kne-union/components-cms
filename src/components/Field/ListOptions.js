@@ -65,7 +65,12 @@ const ListOptions = createWithRemoteLoader({
                 onClick={() => {
                   formModal({
                     title: '表单预览',
-                    children: <ObjectFormInner objectCode={objectCode} groupCode={groupCode} apis={apis} plugins={plugins} />
+                    children: <ObjectFormInner objectCode={objectCode} groupCode={groupCode} apis={apis} plugins={plugins} />,
+                    formProps: {
+                      onSubmit: (formData) => {
+                        console.log(formData);
+                      }
+                    }
                   });
                 }}
               >

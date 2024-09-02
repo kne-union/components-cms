@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { Space, Flex, Button, App } from 'antd';
 import FormInner from './FormInner';
 import Fetch from '@kne/react-fetch';
-import ObjectFormInner from '@components/ObjectFormInner';
+import {ObjectFormInner} from '@components/ObjectFormInner';
 
 const ListOptions = createWithRemoteLoader({
   modules: ['components-core:FormInfo@useFormModal', 'components-core:Global@usePreset', 'components-core:Filter']

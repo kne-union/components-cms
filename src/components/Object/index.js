@@ -118,7 +118,7 @@ const Model = createWithRemoteLoader({
                           formProps: {
                             data: Object.assign({}, item, {
                               name: `${item.name}_copy`,
-                              code: `${item.code}_copy`,
+                              code: `${item.code}_copy`
                             }),
                             onSubmit: async data => {
                               const { data: resData } = await ajax(
@@ -137,6 +137,34 @@ const Model = createWithRemoteLoader({
                           },
                           children: <FormInner isCopy />
                         });
+                      }
+                    },
+                    {
+                      children: '上移',
+                      onClick: async () => {
+                        const { data: resData } = await ajax(
+                          Object.assign({}, apis.cms.object.moveUp, {
+                            data: { id: item.id }
+                          })
+                        );
+                        if (resData.code !== 0) {
+                          return;
+                        }
+                        ref.current.reload();
+                      }
+                    },
+                    {
+                      children: '下移',
+                      onClick: async () => {
+                        const { data: resData } = await ajax(
+                          Object.assign({}, apis.cms.object.moveDown, {
+                            data: { id: item.id }
+                          })
+                        );
+                        if (resData.code !== 0) {
+                          return;
+                        }
+                        ref.current.reload();
                       }
                     },
                     item.status === 0

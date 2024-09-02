@@ -72,6 +72,14 @@ const getApis = options => {
       open: {
         url: `${prefix}/object/open`,
         method: 'POST'
+      },
+      moveUp: {
+        url: `${prefix}/object/moveUp`,
+        method: 'POST'
+      },
+      moveDown: {
+        url: `${prefix}/object/moveDown`,
+        method: 'POST'
       }
     },
     field: {
@@ -117,12 +125,20 @@ const getApis = options => {
         url: `${prefix}/content/getDetail`,
         method: 'GET'
       },
+      getDetailSingle: {
+        url: `${prefix}/content/getDetailSingle`,
+        method: 'GET'
+      },
       add: {
         url: `${prefix}/content/add`,
         method: 'POST'
       },
       save: {
         url: `${prefix}/content/save`,
+        method: 'POST'
+      },
+      saveSingle: {
+        url: `${prefix}/content/saveSingle`,
         method: 'POST'
       },
       remove: {

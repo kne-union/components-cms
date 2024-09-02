@@ -36,7 +36,7 @@ const BaseExample = createWithRemoteLoader({
     >
       <Layout navigation={{ isFixed: false }}>
         <Client
-          groupCode="homepage"
+          groupCode="MessageCenter"
           menuFixed={false}
           plugins={{
             types: [

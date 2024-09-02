@@ -5,7 +5,7 @@ import get from 'lodash/get';
 import Fetch from '@kne/react-fetch';
 import isNil from 'lodash/isNil';
 
-const DisplayFieldValue = ({ value, field, apis, referenceContents, isInline, plugins }) => {
+const DisplayFieldValue = ({ value, field, apis, referenceContents = {}, isInline, plugins }) => {
   const currentTypes = useCurrentTypes(plugins?.types);
   const format = ({ value, field }) => {
     if (isNil(value)) {

@@ -1,25 +1,33 @@
-import { useRef } from 'react';
+import {useRef, useState} from 'react';
 import { useSearchParams, Navigate, useNavigate } from 'react-router-dom';
 import { createWithRemoteLoader } from '@kne/remote-loader';
 import getColumns from './getColumns';
-import { Space, Button, App } from 'antd';
+import {Space, Button, App, Checkbox} from 'antd';
 import Fetch from '@kne/react-fetch';
 import FormInner from './FormInner';
+import saveJSON from "@hkyhy/customize-file-retrieval/saveJSON";
+import dayjs from "dayjs";
 
 const Model = createWithRemoteLoader({
-  modules: ['components-core:Layout@TablePage', 'components-core:Global@usePreset', 'components-core:FormInfo@useFormModal']
+  modules: ['components-core:Layout@TablePage', 'components-core:Global@usePreset', 'components-core:FormInfo@useFormModal', 'Modal@useModal']
 })(({ remoteModules, baseUrl = '' }) => {
-  const [TablePage, usePreset, useFormModal] = remoteModules;
+  const [TablePage, usePreset, useFormModal, useModal] = remoteModules;
   const { ajax, apis } = usePreset();
+  const modal = useModal();
   const [searchParams] = useSearchParams();
   const groupCode = searchParams.get('group');
   const ref = useRef(null);
+  const checkedRef = useRef(null);
   const formModal = useFormModal();
   const navigate = useNavigate();
   const { message } = App.useApp();
+
   if (!groupCode) {
     return <Navigate to="/404" />;
   }
+  const onChange = (checkedValues) => {
+    checkedRef.current = checkedValues;
+  };
 
   return (
     <Fetch
@@ -36,6 +44,40 @@ const Model = createWithRemoteLoader({
               title: data.name,
               titleExtra: (
                 <Space>
+                  <Button
+                    onClick={() => {}}
+                  >
+                    导入
+                  </Button>
+                  <Button
+                    onClick={async () => {
+                      modal({
+                        title: '导出对象',
+                        size: 'small',
+                        onConfirm: async () => {
+                          const { data: resData } = await ajax(
+                            Object.assign({}, apis.cms.object.export, {
+                              data: {
+                                objectIds: checkedRef.current,
+                                groupCode,
+                              }
+                            })
+                          );
+                          if (resData.code === 0) {
+                            saveJSON(resData.data, `${data.name}-${dayjs().format('YYYYMMDDHHmmss')}.json`);
+                          }
+                        },
+                        children: (
+                          <Checkbox.Group
+                            options={(ref.current?.data || []).map((item) => ({ value: item.id, label: item.name }))}
+                            onChange={onChange}
+                          />
+                        )
+                      });
+                    }}
+                  >
+                    导出
+                  </Button>
                   <Button
                     type="primary"
                     onClick={() => {

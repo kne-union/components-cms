@@ -80,6 +80,14 @@ const getApis = options => {
       moveDown: {
         url: `${prefix}/object/moveDown`,
         method: 'POST'
+      },
+      parseJson: {
+        url: `${prefix}/object/parseJson`,
+        method: 'POST'
+      },
+      export: {
+        url: `${prefix}/object/export`,
+        method: 'POST'
       }
     },
     field: {

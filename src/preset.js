@@ -115,9 +115,13 @@ export const globalInit = async () => {
             }
     }
   });
+  const ajaxPostForm = (url, data, options) => {
+    return axios.postForm(url, data, options);
+  };
 
   return {
     ajax,
+    ajaxPostForm,
     apis: {
       cms: getApis()
     },

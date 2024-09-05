@@ -81,8 +81,8 @@ const getApis = options => {
         url: `${prefix}/object/moveDown`,
         method: 'POST'
       },
-      import: {
-        url: `${prefix}/object/import`,
+      parseJson: {
+        url: `${prefix}/object/parseJson`,
         method: 'POST'
       },
       export: {

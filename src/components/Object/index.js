@@ -1,19 +1,21 @@
-import {useRef, useState} from 'react';
-import { useSearchParams, Navigate, useNavigate } from 'react-router-dom';
-import { createWithRemoteLoader } from '@kne/remote-loader';
+import {useRef} from 'react';
+import {Navigate, useNavigate, useSearchParams} from 'react-router-dom';
+import {createWithRemoteLoader} from '@kne/remote-loader';
 import getColumns from './getColumns';
-import {Space, Button, App, Checkbox} from 'antd';
+import {App, Button, Checkbox, Space} from 'antd';
 import Fetch from '@kne/react-fetch';
 import FormInner from './FormInner';
 import saveJSON from "@hkyhy/customize-file-retrieval/saveJSON";
 import dayjs from "dayjs";
+import uniqueId from "lodash/uniqueId";
 
 const Model = createWithRemoteLoader({
-  modules: ['components-core:Layout@TablePage', 'components-core:Global@usePreset', 'components-core:FormInfo@useFormModal', 'Modal@useModal']
+  modules: ['components-core:Layout@TablePage', 'components-core:Global@usePreset', 'components-core:FormInfo@useFormModal', 'Modal@useModal', 'components-core:FormInfo']
 })(({ remoteModules, baseUrl = '' }) => {
-  const [TablePage, usePreset, useFormModal, useModal] = remoteModules;
-  const { ajax, apis } = usePreset();
+  const [TablePage, usePreset, useFormModal, useModal, FormInfo] = remoteModules;
+  const { ajax, apis, ajaxPostForm } = usePreset();
   const modal = useModal();
+  const {Upload} = FormInfo.fields;
   const [searchParams] = useSearchParams();
   const groupCode = searchParams.get('group');
   const ref = useRef(null);
@@ -32,7 +34,7 @@ const Model = createWithRemoteLoader({
   return (
     <Fetch
       {...Object.assign({}, apis.cms.group.getDetailByCode, { params: { code: groupCode } })}
-      render={({ data }) => {
+      render={({ data, reload }) => {
         return (
           <TablePage
             {...Object.assign({}, apis.cms.object.getList, {
@@ -44,11 +46,43 @@ const Model = createWithRemoteLoader({
               title: data.name,
               titleExtra: (
                 <Space>
-                  <Button
-                    onClick={() => {}}
+                  <Upload.Field
+                    block
+                    showUploadList={false}
+                    multiple={false}
+                    labelHidden
+                    rule="REQ"
+                    interceptor="file-format"
+                    renderTips={() => null}
+                    accept={['.json']}
+                    ossUpload={async ({ file }) => {
+                      const {data: resData} = await ajaxPostForm(apis.cms.object.parseJson.url, {file});
+                      if (resData.code !== 0) {
+                        message.error('文件解析错误');
+                        return;
+                      }
+                      ref.current.reload();
+                      return { data: { code: 0, data: { filename: file.filename, id: uniqueId('file-') } } };
+                    }}
                   >
                     导入
-                  </Button>
+                  </Upload.Field>
+                  {/*<Button
+                    onClick={async () => {
+                      const formModalApi = formModal({
+                        title: '导入对象',
+                        size: 'small',
+                        formProps: {
+                          onSubmit: async data => {
+                            console.log('onSubmit', data);
+                          }
+                        },
+                        children: <ObjectImportForm groupCode={groupCode} />
+                      });
+                    }}
+                  >
+                    导入
+                  </Button>*/}
                   <Button
                     onClick={async () => {
                       modal({

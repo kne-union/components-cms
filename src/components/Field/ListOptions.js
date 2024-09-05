@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { Space, Flex, Button, App } from 'antd';
 import FormInner from './FormInner';
 import Fetch from '@kne/react-fetch';
-import ObjectFormInner from '@components/ObjectFormInner';
+import {ObjectFormInner} from '@components/ObjectFormInner';
 
 const ListOptions = createWithRemoteLoader({
   modules: ['components-core:FormInfo@useFormModal', 'components-core:Global@usePreset', 'components-core:Filter']
@@ -65,7 +65,12 @@ const ListOptions = createWithRemoteLoader({
                 onClick={() => {
                   formModal({
                     title: '表单预览',
-                    children: <ObjectFormInner objectCode={objectCode} groupCode={groupCode} apis={apis} plugins={plugins} />
+                    children: <ObjectFormInner objectCode={objectCode} groupCode={groupCode} apis={apis} plugins={plugins} />,
+                    formProps: {
+                      onSubmit: (formData) => {
+                        console.log(formData);
+                      }
+                    }
                   });
                 }}
               >

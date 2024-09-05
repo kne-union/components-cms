@@ -2,7 +2,7 @@ import { createWithRemoteLoader } from '@kne/remote-loader';
 import { useRef, useState } from 'react';
 import { Space, Button, App, Empty } from 'antd';
 import Fetch from '@kne/react-fetch';
-import ObjectFormInner from '@components/ObjectFormInner';
+import { ObjectFormInner } from '@components/ObjectFormInner';
 import ContentView, { DisplayFieldValue } from '@components/ContentView';
 import { useCurrentTypes } from '@components/Field';
 import style from './style.module.scss';

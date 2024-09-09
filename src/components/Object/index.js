@@ -56,7 +56,7 @@ const Model = createWithRemoteLoader({
                     renderTips={() => null}
                     accept={['.json']}
                     ossUpload={async ({ file }) => {
-                      const {data: resData} = await ajaxPostForm(apis.cms.object.parseJson.url, {file});
+                      const {data: resData} = await ajaxPostForm(apis.cms.object.parseJson.url, {file, groupCode});
                       if (resData.code !== 0) {
                         message.error('文件解析错误');
                         return;
